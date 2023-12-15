@@ -35,7 +35,8 @@ for i in range(numb - 1, 1, -1):
     print(i, end = ' ')
 
 ###4 Программа находит наибольший общий делитель для двух введенных чисел.
-
+a = int(input("Number1"))
+b = int(input("Number2"))
 def find(a,b):
     while a!= b:
         if a > b:
@@ -43,7 +44,7 @@ def find(a,b):
         else:
             b -= a
     return a
-res = find(84, 24)
+res = find(a, b)
 print(res)
 
 ###5 Программа запрашивает число, а затем выводит квадрат из *, где длина стороны равна данному числу.
@@ -52,12 +53,20 @@ for i in range (n):
     print("*" * n)
 
 ###6  Программа запрашивает два числа, а затем выводит прямоугольник из *, где длины сторон равны данным числам.
-
-n = 3
-m = 4
+n = int(input('length : '))
+m = int(input('width : '))
 print(('*' * n + '\n') * m)
 
+
 ###7 Программа запрашивает два числа и выводит на экран прямоугольник, в котором змейкой по вертикали записаны числа, начиная с 1
-n = 3
-for i in range(1, n+1):
-    print(range(i, n * n + 1, n))
+n = int(input('length : '))
+m = int(input('width : '))
+for j in range(n):
+    for i in range(0, n * m, n):
+        print(i + j + 1, end=' ')
+    print()
+
+
+
+
+
