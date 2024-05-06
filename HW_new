@@ -1,0 +1,77 @@
+#12.По выравненной multiFASTA с последовательностями ДНК построить матрицу вероятности замен между отдельными буквами.
+def build_matrix(fasta_seq):
+  """
+    Постройка вероятностную матрицу для замен последовательностей ДНК
+    """
+    # Инициализируйте матрицу подстановки
+    # Функция инициализирует матрицу нулей размером 4х4, используя функцию numpy.zeros.
+    # Эта матрица будет использоваться для хранения количества каждой возможной замены между четырьмя основаниями ДНК (A, C, G и T).
+
+    sub_matrix = [[0]*4 for _ in range(4)]
+
+    for sequence in fasta_seq: 
+          # Для каждой последовательности функция перебирает каждую пару соседних оснований, используя другой цикл for.
+        for i in range(len(sequence) - 1): # len(s) возвращает длину строки s, а range(len(s)) генерирует последовательность чисел от 0 до len(s) - 1. Затем каждое число используется как индекс для доступа к символам строки.
+             # Получение текущую и следующую базы
+            base1 = sequence[i]
+            base2 = sequence[i + 1] # Эти линии извлекают два соседних основания из текущей пары.
+
+            sub_matrix[('A', 'C', 'G', 'T').index(base1)][('A', 'C', 'G', 'T').index(base2)] += 1 
+
+
+    total_substitutions = sum(sum(row) for row in sub_matrix) # В этой строке вычисляется общее количество подстановок в матрице подстановок путем суммирования всех ее элементов.
+
+    sub_matrix = [list(map(lambda x: x/total_substitutions, row)) for row in sub_matrix] # Эта строка нормализует матрицу подстановок путем деления всех ее элементов на общее количество подстановок.
+    return sub_matrix
+
+fasta_seq = [
+    'ATGCGATCGATCGATCGTAGCTAGCTAGCT'
+]
+
+sub_matrix = build_matrix(fasta_seq)
+print(sub_matrix)
+
+
+# 16.Написать программу, которая получает на вход имена bed файла и fasta файла,
+#и должна вернуть fasta файл, содержащий последовательности из интервалов,
+#описанных в bed-файле. Каждый интервал – отдельная запись. По заголовкам
+#должно быть понятно, к какой исходной последовательности и интервалу
+#относится запись
+
+def extract_seq_from_intervals(fasta_file, bed_file, output_file):
+
+    bed_data = [] # Эта строка инициализирует пустой список с именем bed_data. Этот список будет использоваться для хранения проанализированных данных из файла BED.
+    bed_file_obj = open(bed_file, 'r')
+    for line in bed_file_obj: # Эта строка запускает цикл, который повторяется по каждой строке в объекте BED file.
+        chr, start, end, name, *_ = line.strip().split('\t') # Эта строка анализирует каждую строку файла BED и извлекает соответствующую информацию. В частности, это:
+        bed_data.append((chr, int(start), int(end), name)) # append - добавляет в конец списка элемент, переданный ему в качестве аргумента.
+    bed_file_obj.close()
+
+    # Извлечение последовательностей из файла FASTA: 
+    seq = {} 
+    current_seq = "" 
+    current_chr = None 
+    fasta_file_obj = open(fasta_file, 'r') 
+    for line in fasta_file_obj:
+        if line.startswith(">"): 
+            if current_chr:
+                seq[current_chr] = current_seq
+                current_seq = "" 
+            current_chr = line[1:].strip() 
+        else: 
+            current_seq += line.strip() 
+    seq[current_chr] = current_seq 
+    fasta_file_obj.close() 
+
+    # Запишите выходной файл FASTA: 
+    output_fasta_file = open(output_file, "w")
+    for chr, start, end, name in bed_data:
+        seq = seq[chr][start-1:end] 
+        output_fasta_file.write(">" + chr + "_" + start + "-" + end + "_" + name + "\n" + sequence + "\n") 
+    output_fasta_file.close()
+
+if __name__ == "__main__":
+    fasta_file = "example.fasta"
+    bed_file = "example.bed"
+    output_file = "my_output.fasta"
+    extract_seq_from_intervals(fasta_file, bed_file, output_file)
